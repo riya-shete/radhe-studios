@@ -23,7 +23,7 @@ const galleryItems = [
   { id: 6, title: 'Maternity Photoshoots', subtitle: 'Cherishing new beginnings' },
   { id: 7, title: 'Family Portraits', subtitle: 'Love and togetherness in frames' },
   { id: 8, title: 'Fashion Photography', subtitle: 'Creative and stylish portraits' },
-  { id: 9, title: 'Corporate Events', subtitle: 'Professional event coverage' },
+  { id: 9, title: 'Haldi Ceremony', subtitle: 'Haldi event coverage' },
   { id: 10, title: 'Birthday Photography', subtitle: 'Memories of special days' },
   { id: 11, title: 'Travel Photography', subtitle: 'Capturing places & stories' },
   { id: 12, title: 'Black & White Classics', subtitle: 'Timeless monochrome shots' },
