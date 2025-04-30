@@ -4,17 +4,6 @@ import Logo from "../assets/Images/logo.png";
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  const services = [
-    "Wedding",
-    "Pre-Wedding",
-    "Portraits",
-    "Studio Photography",
-    "Family",
-    "Corporate",
-    "Commercial",
-    "& Many More",
-  ];
-
   return (
     <footer className="bg-gradient-to-b from-gray-50 to-white pt-12 pb-6 border-t border-gray-100 shadow-inner relative">
       {/* Mobile-optimized top shadow */}
@@ -25,8 +14,8 @@ const Footer = () => {
         <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full opacity-5 -translate-y-1/2 translate-x-1/4 md:w-64 md:h-64 hidden sm:block"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-red-50 rounded-full opacity-5 translate-y-1/4 -translate-x-1/4 md:w-48 md:h-48 hidden sm:block"></div>
 
-        {/* Main footer grid - Improved mobile layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 relative z-10">
+        {/* Main footer grid - two columns only */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 relative z-10">
           {/* About/Logo Section */}
           <div className="space-y-3 md:space-y-4 flex flex-col items-center md:items-start text-center md:text-left">
             <div className="bg-white p-2 md:p-3 inline-block rounded-lg shadow-sm">
@@ -43,34 +32,6 @@ const Footer = () => {
             <div className="text-xs md:text-sm text-gray-600">
               <p className="font-medium">Aniket Patil PhotoFilms</p>
             </div>
-          </div>
-
-          {/* Services Section - Optimized for mobile */}
-          <div className="space-y-3 md:space-y-4">
-            <h3 className="text-base md:text-lg font-medium text-gray-800 pb-2 border-b border-gray-100 text-center md:text-left">
-              Our Services
-            </h3>
-            <ul className="grid grid-cols-2 gap-x-2 gap-y-3 md:gap-3 lg:grid-cols-1">
-              {services.map((service, index) => (
-                <li
-                  key={index}
-                  className="text-gray-600 text-xs md:text-sm flex items-start group transition-colors duration-300 hover:text-red-600"
-                >
-                  <svg
-                    className="w-3 h-3 text-red-600 mr-2 mt-0.5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                  <span>{service}</span>
-                </li>
-              ))}
-            </ul>
           </div>
 
           {/* Contact Information - Left aligned on all screens */}

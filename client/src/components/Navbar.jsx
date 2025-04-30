@@ -42,6 +42,8 @@ const Navbar = () => {
     const handleClickOutside = (event) => {
       if (
         isOpen &&
+        navbarRef.current &&
+        mobileMenuRef.current &&
         !navbarRef.current.contains(event.target) &&
         !mobileMenuRef.current.contains(event.target)
       ) {
@@ -53,16 +55,75 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
+  // Set up scroll observer to automatically update active link
+  useEffect(() => {
+    const sections = document.querySelectorAll("section[id]");
+
+    const scrollObserver = () => {
+      const scrollY = window.scrollY;
+
+      sections.forEach((section) => {
+        const sectionTop = section.offsetTop - 100;
+        const sectionHeight = section.offsetHeight;
+        const sectionId = section.getAttribute("id");
+
+        // Map section IDs to nav names
+        const sectionToNavMap = {
+          home: "Home",
+          hero: "Home",
+          banner: "Home",
+          main: "Home",
+          about: "About",
+          portfolio: "Portfolio",
+          services: "Services",
+        };
+
+        if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+          if (sectionToNavMap[sectionId]) {
+            setActiveLink(sectionToNavMap[sectionId]);
+          }
+        }
+      });
+    };
+
+    window.addEventListener("scroll", scrollObserver);
+    return () => window.removeEventListener("scroll", scrollObserver);
+  }, []);
+
   const navLinks = [
-    { name: "Home", href: "#home" },
+    { name: "Home", href: "#" },
     { name: "About", href: "#about" },
     { name: "Portfolio", href: "#portfolio" },
     { name: "Services", href: "#services" },
   ];
 
-  const handleLinkClick = (name) => {
+  const handleLinkClick = (name, href, e) => {
+    e.preventDefault();
     setActiveLink(name);
     setIsOpen(false);
+
+    // For Home link, scroll to top
+    if (name === "Home") {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+      return;
+    }
+
+    // For other links, try to find the section and scroll to it
+    const targetSection = document.querySelector(href);
+    if (targetSection) {
+      const navbarHeight = navbarRef.current
+        ? navbarRef.current.offsetHeight
+        : 0;
+      const targetPosition = targetSection.offsetTop - navbarHeight;
+
+      window.scrollTo({
+        top: targetPosition,
+        behavior: "smooth",
+      });
+    }
   };
 
   return (
@@ -78,7 +139,12 @@ const Navbar = () => {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <a href="#home" className="flex items-center" aria-label="Home">
+          <a
+            href="#"
+            className="flex items-center"
+            aria-label="Home"
+            onClick={(e) => handleLinkClick("Home", "#", e)}
+          >
             <img
               src={Logo}
               alt="Company Logo"
@@ -103,7 +169,7 @@ const Navbar = () => {
                     ? "text-white font-semibold"
                     : "text-white/90 hover:text-white"
                 }`}
-                onClick={() => handleLinkClick(link.name)}
+                onClick={(e) => handleLinkClick(link.name, link.href, e)}
                 aria-current={activeLink === link.name ? "page" : undefined}
               >
                 {link.name}
@@ -184,7 +250,7 @@ const Navbar = () => {
                   ? "text-black font-semibold"
                   : "text-gray-600 hover:text-black"
               }`}
-              onClick={() => handleLinkClick(link.name)}
+              onClick={(e) => handleLinkClick(link.name, link.href, e)}
               aria-current={activeLink === link.name ? "page" : undefined}
             >
               {link.name}

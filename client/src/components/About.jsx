@@ -57,27 +57,27 @@ const About = () => {
       </div>
 
       {/* Content Container */}
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Section Title */}
         <div
           ref={titleRef}
-          className="text-center mb-16 opacity-0 transform translate-y-6 transition-all duration-1000 ease-out"
+          className="text-center mb-12 md:mb-16 opacity-0 transform translate-y-6 transition-all duration-1000 ease-out"
         >
           <h6 className="text-sm tracking-[0.25em] uppercase mb-3 text-red-600 relative after:block after:w-16 after:h-px after:bg-red-300 after:mx-auto after:mt-4">
             About Our Studio
           </h6>
-          <h2 className="text-3xl md:text-4xl font-light text-gray-800 leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-light text-gray-800 leading-tight">
             Capturing Life's Most{" "}
             <span className="font-medium">Meaningful Moments</span>
           </h2>
         </div>
 
-        {/* Image and Content */}
-        <div className="flex flex-col lg:flex-row items-center gap-16">
-          {/* Image Section */}
+        {/* Image and Content - Reordered for mobile */}
+        <div className="flex flex-col lg:flex-row items-center gap-8 md:gap-16">
+          {/* Image Section - Adjusted for full visibility */}
           <div
             ref={imageRef}
-            className="w-full lg:w-1/2 opacity-0 transform translate-x-10 transition-all duration-1000 ease-out"
+            className="w-full lg:w-1/2 opacity-0 transform translate-x-10 transition-all duration-1000 ease-out px-6 sm:px-10 md:px-8"
           >
             <div className="relative p-1 border border-red-100 bg-white shadow-lg">
               <img
@@ -95,7 +95,7 @@ const About = () => {
           {/* Text Content */}
           <div
             ref={contentRef}
-            className="w-full lg:w-1/2 opacity-0 transform translate-y-10 transition-all duration-1000 ease-out"
+            className="w-full lg:w-1/2 mt-16 lg:mt-0 opacity-0 transform translate-y-10 transition-all duration-1000 ease-out"
           >
             <p className="text-base text-gray-600 mb-6 leading-relaxed">
               We are a photography studio dedicated to creating timeless imagery
@@ -138,11 +138,21 @@ const About = () => {
         </div>
       </div>
 
-      {/* Animation Styles */}
+      {/* Mobile-specific styles to ensure image is fully visible */}
       <style jsx>{`
         .animate-in {
           opacity: 1 !important;
           transform: translate(0, 0) !important;
+        }
+
+        @media (max-width: 768px) {
+          .corner-rose-left {
+            left: -8px !important;
+          }
+
+          .frame-border-left {
+            left: -8px !important;
+          }
         }
       `}</style>
     </section>
@@ -167,12 +177,12 @@ const DecorativeRose = () => (
 
 const CornerRoses = () => (
   <>
-    <div className="absolute -top-8 -right-8 w-16 h-16 opacity-40">
+    <div className="absolute -top-8 -right-8 w-14 sm:w-16 h-14 sm:h-16 opacity-40">
       <svg viewBox="0 0 24 24" className="text-red-600" fill="currentColor">
         <path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" />
       </svg>
     </div>
-    <div className="absolute -bottom-8 -left-8 w-16 h-16 opacity-40 rotate-180">
+    <div className="absolute -bottom-8 -left-8 w-14 sm:w-16 h-14 sm:h-16 opacity-40 rotate-180 corner-rose-left">
       <svg viewBox="0 0 24 24" className="text-red-600" fill="currentColor">
         <path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" />
       </svg>
@@ -182,8 +192,8 @@ const CornerRoses = () => (
 
 const FrameBorders = () => (
   <>
-    <div className="absolute -top-3 -right-3 w-32 h-32 border-t border-r border-red-200"></div>
-    <div className="absolute -bottom-3 -left-3 w-32 h-32 border-b border-l border-red-200"></div>
+    <div className="absolute -top-3 -right-3 w-24 sm:w-32 h-24 sm:h-32 border-t border-r border-red-200"></div>
+    <div className="absolute -bottom-3 -left-3 w-24 sm:w-32 h-24 sm:h-32 border-b border-l border-red-200 frame-border-left"></div>
   </>
 );
 
