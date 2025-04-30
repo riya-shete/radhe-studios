@@ -1,11 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import HeroImage from "../assets/Images/hero_updated.jpeg";
 
 const Hero = () => {
+  const [scrolled, setScrolled] = useState(false);
+
+  // Add subtle parallax effect on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      if (scrollTop > 20) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className="relative w-full h-screen overflow-hidden">
-      {/* Background Image Container */}
-      <div className="absolute inset-0">
+    <div className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background Image - Original proportions maintained */}
+      <div
+        className="absolute inset-0 transform transition-transform duration-700"
+        style={{ transform: scrolled ? "scale(1.05)" : "scale(1.03)" }}
+      >
         <img
           src={HeroImage}
           alt="Radhe Studios Professional Photography"
@@ -18,95 +38,53 @@ const Hero = () => {
         />
       </div>
 
-      {/* Gradient Overlay - Adjusted for blue text visibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-white/70 via-white/50 to-transparent z-1"></div>
+      {/* Subtle overlay for better text contrast */}
+      <div className="absolute inset-0 bg-black/20 z-1"></div>
 
-      {/* Content Container - Moved to bottom left */}
-      <div className="relative z-10 h-full flex items-end justify-start px-6 pb-20 lg:pb-24 lg:px-16">
-        <div className="max-w-2xl text-left">
-          {/* Logo Text with blue and fuchsia typography */}
-          <h1
-            className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 tracking-tight"
-            style={{ color: "#03435f" }}
-          >
-            <span className="block">RADHE</span>
-            <span
-              className="block text-transparent bg-clip-text mt-1"
-              style={{
-                backgroundImage: "linear-gradient(to right, #03435f, #ff005e)",
-              }}
-            >
-              STUDIOS
-            </span>
-          </h1>
+      {/* Content Container - REPOSITIONED to bottom */}
+      <div className="absolute bottom-16 left-0 right-0 z-10 px-6 text-center animate-fade-in">
+        {/* Studio name - Positioned to avoid obscuring faces */}
+        <h1 className="text-4xl md:text-6xl font-normal tracking-wider mb-2 text-white drop-shadow-lg">
+          RADHE STUDIOS
+        </h1>
 
-          {/* Refined divider - left aligned with color combo */}
-          <div
-            className="w-24 h-px my-6"
-            style={{
-              backgroundImage: "linear-gradient(to right, #03435f, #ff005e)",
-            }}
-          ></div>
+        {/* Tagline - Below main title */}
+        <p className="text-sm md:text-base text-white font-medium mb-8 tracking-[0.25em] uppercase drop-shadow-lg">
+          WHERE ART MEETS THE LENS
+        </p>
 
-          {/* Client's tagline */}
-          <p
-            className="text-lg max-w-xl leading-relaxed mb-8 font-medium"
-            style={{ color: "#03435f" }}
-          >
-            Where Art Meets The Lense
-          </p>
-
-          {/* Call to action buttons */}
-          <div className="flex flex-col sm:flex-row gap-5">
-            <button
-              className="px-8 py-3.5 text-white font-medium rounded-none hover:shadow-lg transition-all duration-300 flex items-center justify-center"
-              style={{ backgroundColor: "#03435f" }}
-            >
-              View Portfolio
-              <svg
-                className="w-4 h-4 ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              </svg>
-            </button>
-            <button
-              className="px-8 py-3.5 border font-medium rounded-none hover:bg-pink-50 transition-all duration-300"
-              style={{ borderColor: "#ff005e", color: "#ff005e" }}
-            >
-              Book a Session
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="hidden lg:block absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
-        <div className="animate-pulse duration-1000">
-          <svg
-            className="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
+        {/* Buttons - At the bottom */}
+        <div className="flex flex-row gap-4 justify-center">
+          <button className="px-8 py-3 text-white font-medium border border-white hover:bg-white hover:text-black transition-all duration-300 tracking-wider text-sm">
+            View Portfolio
+          </button>
+          <button className="px-8 py-3 text-black font-medium bg-white hover:bg-white/90 transition-all duration-300 tracking-wider text-sm">
+            Book a Session
+          </button>
         </div>
       </div>
     </div>
   );
 };
+
+// Add this CSS in your global styles or component
+const styleElement = document.createElement("style");
+styleElement.textContent = `
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 1s ease-out forwards;
+  }
+`;
+document.head.appendChild(styleElement);
 
 export default Hero;
