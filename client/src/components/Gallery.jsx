@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Import all images
 import img1 from "../assets/Images/image1_updated.jpeg";
@@ -15,20 +15,14 @@ import img11 from "../assets/Images/image11.jpeg";
 import img12 from "../assets/Images/image12.jpeg";
 
 const Gallery = () => {
-  // Brand colors - exactly matching the About section
+  // Brand colors
   const brandRed = "#b91c1c"; // red-700
-  const brandRedLight = "#fee2e2"; // red-100
   const textDark = "#1f2937"; // gray-800
   const textLight = "#6b7280"; // gray-500
 
-  // Refs for elements
-  const sectionRef = useRef(null);
-  const galleryRef = useRef(null);
-
-  // States for interactions
-  const [hoverIndex, setHoverIndex] = useState(null);
-  const [scrollY, setScrollY] = useState(0);
+  // States
   const [filterCategory, setFilterCategory] = useState("all");
+  const [activeImageId, setActiveImageId] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
 
   // Image categories
@@ -40,25 +34,22 @@ const Gallery = () => {
     { id: "family", label: "Family" },
   ];
 
-  // Enhanced image data with categories
-  const galleryStructure = [
-    // Top hero image
+  // Image data
+  const galleryImages = [
     {
       id: 11,
       title: "Travel Photography",
       subtitle: "Capturing breathtaking places & stories around the world",
       image: img11,
-      className: "col-span-full md:col-span-6 hero-item",
+      isHero: true,
       category: "travel",
     },
-
-    // Left column - taller images
     {
       id: 1,
       title: "Wedding Collections",
       subtitle: "Complete wedding photography",
       image: img1,
-      className: "col-span-full md:col-span-2 md:row-span-2 md:h-[36rem]",
+      isTall: true,
       category: "wedding",
     },
     {
@@ -66,17 +57,14 @@ const Gallery = () => {
       title: "Pre-Wedding Shoots",
       subtitle: "Creating memories before the big day",
       image: img5,
-      className: "col-span-full md:col-span-2 md:row-span-2 md:h-[36rem]",
+      isTall: true,
       category: "wedding",
     },
-
-    // Middle column
     {
       id: 12,
       title: "Black & White Classics",
       subtitle: "Timeless monochrome shots",
       image: img12,
-      className: "col-span-full md:col-span-2 md:row-span-1 md:h-72",
       category: "portrait",
     },
     {
@@ -84,7 +72,6 @@ const Gallery = () => {
       title: "Fashion Photography",
       subtitle: "Creative and stylish portraits",
       image: img8,
-      className: "col-span-full md:col-span-2 md:row-span-1 md:h-72",
       category: "portrait",
     },
     {
@@ -92,7 +79,6 @@ const Gallery = () => {
       title: "Outdoor Photography",
       subtitle: "Beautiful scenic portraits",
       image: img3,
-      className: "col-span-full md:col-span-2 md:row-span-1 md:h-72",
       category: "travel",
     },
     {
@@ -100,17 +86,13 @@ const Gallery = () => {
       title: "Birthday Photography",
       subtitle: "Memories of special days",
       image: img10,
-      className: "col-span-full md:col-span-2 md:row-span-1 md:h-72",
       category: "family",
     },
-
-    // Right column - varied heights
     {
       id: 4,
       title: "Candid Moments",
       subtitle: "Real emotions, raw beauty",
       image: img4,
-      className: "col-span-full md:col-span-2 md:row-span-1 md:h-80",
       category: "wedding",
     },
     {
@@ -118,7 +100,6 @@ const Gallery = () => {
       title: "Family Portraits",
       subtitle: "Love and togetherness in frames",
       image: img7,
-      className: "col-span-full md:col-span-2 md:row-span-1 md:h-64",
       category: "family",
     },
     {
@@ -126,7 +107,6 @@ const Gallery = () => {
       title: "Engagement Shoots",
       subtitle: "Capturing the special moments",
       image: img2,
-      className: "col-span-full md:col-span-2 md:row-span-1 md:h-80",
       category: "wedding",
     },
     {
@@ -134,17 +114,14 @@ const Gallery = () => {
       title: "Haldi Ceremony",
       subtitle: "Haldi event coverage",
       image: img9,
-      className: "col-span-full md:col-span-2 md:row-span-1 md:h-64",
       category: "wedding",
     },
-
-    // Bottom full width
     {
       id: 6,
       title: "Maternity Sessions",
       subtitle: "Cherishing new beginnings",
       image: img6,
-      className: "col-span-full md:col-span-6 md:h-80",
+      isHero: true,
       category: "family",
     },
   ];
@@ -152,8 +129,15 @@ const Gallery = () => {
   // Filter images based on selected category
   const filteredImages =
     filterCategory === "all"
-      ? galleryStructure
-      : galleryStructure.filter((item) => item.category === filterCategory);
+      ? galleryImages
+      : galleryImages.filter((item) => item.category === filterCategory);
+
+  // Toggle image info
+  const toggleImageInfo = (id) => {
+    if (isMobile) {
+      setActiveImageId((prevId) => (prevId === id ? null : id));
+    }
+  };
 
   // Check for mobile devices
   useEffect(() => {
@@ -169,547 +153,23 @@ const Gallery = () => {
     };
   }, []);
 
-  // Track scroll position for subtle animations
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  // Apply animation when changing categories
-  useEffect(() => {
-    if (galleryRef.current) {
-      galleryRef.current.classList.add("category-transition");
-      setTimeout(() => {
-        if (galleryRef.current) {
-          galleryRef.current.classList.remove("category-transition");
-        }
-      }, 500);
-    }
-
-    // Apply staggered loading animation to gallery items
-    const items = document.querySelectorAll(".gallery-item");
-    items.forEach((item, index) => {
-      item.classList.remove("loaded");
-      setTimeout(() => {
-        item.classList.add("loaded");
-      }, 100 + index * 100);
-    });
-  }, [filterCategory]);
-
-  // Add enhanced styles with cleaner background
-  useEffect(() => {
-    const style = document.createElement("style");
-    style.innerHTML = `
-      /* Main container styling - clean white background */
-      .gallery-section {
-        position: relative;
-        background: white;
-        overflow: hidden;
-      }
-      
-      /* Subtle rose corner decorations */
-      .decorative-rose {
-        position: absolute;
-        opacity: 0.03;
-        pointer-events: none;
-        z-index: 1;
-      }
-      
-      .decorative-rose.top-right {
-        top: 10%;
-        right: 10%;
-        width: 64px;
-        height: 64px;
-      }
-      
-      .decorative-rose.bottom-left {
-        bottom: 10%;
-        left: 10%;
-        width: 48px;
-        height: 48px;
-        transform: rotate(180deg);
-      }
-      
-      /* Content container */
-      .content-container {
-        position: relative;
-        z-index: 10;
-      }
-      
-      /* Elegant heading styles with subtle red accents */
-      .portfolio-title {
-        font-size: 0.75rem;
-        font-weight: 400;
-        letter-spacing: 0.25em;
-        text-transform: uppercase;
-        color: ${brandRed};
-        margin-bottom: 0.75rem;
-        position: relative;
-        display: inline-block;
-      }
-      
-      .gallery-heading {
-        font-size: 2.25rem;
-        font-weight: 300;
-        color: ${textDark};
-        margin-bottom: 1.5rem;
-        position: relative;
-        display: inline-block;
-      }
-      
-      .gallery-description {
-        color: ${textLight};
-        font-weight: 300;
-        font-size: 1rem;
-        line-height: 1.7;
-        margin-bottom: 3rem;
-      }
-      
-      /* Subtle divider with red heart */
-      .section-divider {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        margin: 1.5rem 0 2.5rem;
-      }
-      
-      .divider-line {
-        height: 1px;
-        background-color: #e5e7eb;
-        width: 80px;
-      }
-      
-      .divider-icon {
-        margin: 0 1rem;
-        color: ${brandRed};
-      }
-      
-      /* Category filter with subtle styling */
-      .category-filter {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 3rem;
-      }
-      
-      .category-button {
-        background: none;
-        border: none;
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
-        color: ${textLight};
-        cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-        font-weight: 400;
-        letter-spacing: 0.05em;
-      }
-      
-      .category-button::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        width: 0;
-        height: 1px;
-        background-color: ${brandRed};
-        transition: all 0.3s ease;
-        transform: translateX(-50%);
-      }
-      
-      .category-button:hover {
-        color: ${textDark};
-      }
-      
-      .category-button:hover::after {
-        width: 20px;
-      }
-      
-      .category-button.active {
-        color: ${brandRed};
-      }
-      
-      .category-button.active::after {
-        width: 30px;
-        background-color: ${brandRed};
-      }
-      
-      /* Refined grid with better spacing */
-      .gallery-grid {
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 20px;
-        position: relative;
-        z-index: 10;
-        transition: opacity 0.3s ease;
-      }
-      
-      .category-transition {
-        opacity: 0.7;
-      }
-      
-      /* Gallery item styling with clean design */
-      .gallery-item {
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.5s ease;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-        border: 1px solid rgba(0,0,0,0.03);
-        border-radius: 2px;
-        cursor: pointer;
-      }
-      
-      .gallery-item:hover {
-        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-        transform: translateY(-5px) scale(1.01);
-      }
-      
-      /* Image styling */
-      .gallery-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.75s cubic-bezier(0.165, 0.84, 0.44, 1);
-      }
-      
-      .gallery-item:hover .gallery-image {
-        transform: scale(1.08);
-      }
-      
-      /* Refined overlay - HIDDEN BY DEFAULT */
-      .gallery-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to top, 
-          rgba(0, 0, 0, 0.85) 0%, 
-          rgba(0, 0, 0, 0.5) 40%, 
-          rgba(0, 0, 0, 0.2) 80%, 
-          transparent 100%);
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 28px;
-        opacity: 0;
-        transition: opacity 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), visibility 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-        visibility: hidden;
-      }
-      
-      .gallery-item:hover .gallery-overlay {
-        opacity: 1;
-        visibility: visible;
-      }
-      
-      /* Text styling */
-      .gallery-text {
-        transform: translateY(25px);
-        opacity: 0;
-        transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-        transition-delay: 0.1s;
-      }
-      
-      .gallery-item:hover .gallery-text {
-        transform: translateY(0);
-        opacity: 1;
-      }
-      
-      .gallery-title {
-        color: white;
-        font-weight: 400;
-        margin-bottom: 4px;
-        font-size: 1.1rem;
-        letter-spacing: 0.02em;
-      }
-      
-      .gallery-subtitle {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 0.85rem;
-        font-weight: 300;
-        letter-spacing: 0.01em;
-      }
-      
-      .gallery-divider {
-        width: 0;
-        height: 1px;
-        background: ${brandRed};
-        margin: 8px 0;
-        transition: width 0.4s ease 0.3s;
-      }
-      
-      .gallery-item:hover .gallery-divider {
-        width: 25px;
-      }
-      
-      /* Category badge */
-      .category-badge {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        background-color: rgba(0, 0, 0, 0.6);
-        color: white;
-        font-size: 0.7rem;
-        padding: 3px 8px;
-        border-radius: 3px;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-weight: 400;
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-        transition-delay: 0.2s;
-      }
-      
-      .gallery-item:hover .category-badge {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      
-      /* Full height hero item on desktop */
-      @media (min-width: 768px) {
-        .hero-item {
-          height: 90vh !important;
-          min-height: 600px;
-        }
-        
-        .hero-item .gallery-title {
-          font-size: 1.5rem;
-          font-weight: 300;
-          letter-spacing: 0.05em;
-        }
-        
-        .hero-item .gallery-subtitle {
-          font-size: 1rem;
-        }
-        
-        .hero-item .gallery-divider {
-          width: 0;
-        }
-        
-        .hero-item:hover .gallery-divider {
-          width: 40px;
-        }
-      }
-      
-      /* Mobile specific styles */
-      @media (max-width: 767px) {
-        .gallery-grid {
-          grid-template-columns: 1fr !important;
-          gap: 24px;
-        }
-        
-        .gallery-item {
-          grid-column: 1 / -1 !important;
-          height: 350px !important;
-        }
-        
-        .hero-item {
-          height: 500px !important;
-        }
-        
-        .gallery-heading {
-          font-size: 1.75rem;
-        }
-        
-        .gallery-overlay {
-          /* For touch devices, we'll use a tap-to-reveal approach */
-          transition: opacity 0.4s ease;
-          background: linear-gradient(to top, 
-            rgba(0, 0, 0, 0.7) 0%, 
-            rgba(0, 0, 0, 0.3) 50%, 
-            transparent 100%);
-        }
-        
-        /* For mobile devices only, when item is tapped, the gallery text will be visible */
-        .gallery-item.tapped .gallery-overlay {
-          opacity: 1;
-          visibility: visible;
-        }
-        
-        .gallery-item.tapped .gallery-text {
-          transform: translateY(0);
-          opacity: 1;
-        }
-        
-        .gallery-item.tapped .category-badge {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        
-        .gallery-item.tapped .gallery-divider {
-          width: 25px;
-        }
-        
-        .category-filter {
-          gap: 0.25rem;
-        }
-        
-        .category-button {
-          padding: 0.5rem 0.75rem;
-          font-size: 0.8rem;
-        }
-      }
-      
-      /* Clean button with subtle styling */
-      .portfolio-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 12px 32px;
-        background: none;
-        border: 1px solid ${textDark};
-        color: ${textDark};
-        font-size: 0.8rem;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        font-weight: 400;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        overflow: hidden;
-        position: relative;
-      }
-      
-      .portfolio-button:after {
-        content: '';
-        position: absolute;
-        z-index: -1;
-        background-color: ${textDark};
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: -100%;
-        transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-      }
-      
-      .portfolio-button:hover {
-        color: white;
-      }
-      
-      .portfolio-button:hover:after {
-        left: 0;
-      }
-      
-      .arrow-icon {
-        margin-left: 8px;
-        position: relative;
-        transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-      }
-      
-      .portfolio-button:hover .arrow-icon {
-        transform: translateX(8px);
-      }
-      
-      /* Loading animations */
-      .gallery-item {
-        opacity: 0;
-        transform: translateY(40px);
-        transition: opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1), 
-                    transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
-      }
-      
-      .gallery-item.loaded {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      
-      /* No results message */
-      .no-results {
-        text-align: center;
-        padding: 4rem 0;
-        color: ${textLight};
-        font-size: 1.1rem;
-        font-weight: 300;
-      }
-    `;
-
-    document.head.appendChild(style);
-
-    // Apply initial loading animation
-    const items = document.querySelectorAll(".gallery-item");
-    items.forEach((item, index) => {
-      setTimeout(() => {
-        item.classList.add("loaded");
-      }, 100 + index * 100);
-    });
-
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, [scrollY, textDark, brandRed, textLight, brandRedLight]);
-
-  // Handle click for mobile devices (toggle overlay visibility)
-  const handleItemClick = (index) => {
-    if (isMobile) {
-      const items = document.querySelectorAll(".gallery-item");
-
-      // Remove tapped class from all items
-      items.forEach((item) => {
-        item.classList.remove("tapped");
-      });
-
-      // Toggle tapped class for clicked item
-      if (hoverIndex === index) {
-        setHoverIndex(null);
-      } else {
-        setHoverIndex(index);
-        items[index].classList.add("tapped");
-      }
-    }
-  };
-
   return (
-    <section ref={sectionRef} className="py-24 gallery-section" id="portfolio">
-      {/* Very subtle rose corner decorations */}
-      <div className="decorative-rose top-right">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="text-red-600"
-        >
-          <path
-            d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
-            fill="currentColor"
-          />
-        </svg>
-      </div>
-      <div className="decorative-rose bottom-left">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="text-red-600"
-        >
-          <path
-            d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
-            fill="currentColor"
-          />
-        </svg>
-      </div>
+    <section className="py-24 bg-white" id="portfolio">
+      <div className="container mx-auto px-4 sm:px-6">
+        {/* Section header */}
+        <div className="text-center mb-12">
+          <h5 className="text-red-700 text-sm uppercase tracking-widest mb-2">
+            Our Portfolio
+          </h5>
+          <h2 className="text-3xl font-light text-gray-800 mb-4">
+            A Collection of Moments
+          </h2>
 
-      <div className="container mx-auto px-6 lg:px-8 content-container">
-        {/* Clean heading with subtle red accent */}
-        <div className="text-center mb-8">
-          <h5 className="portfolio-title">Our Portfolio</h5>
-          <h2 className="gallery-heading">A Collection of Moments</h2>
-
-          {/* Subtle heart divider */}
-          <div className="section-divider">
-            <div className="divider-line"></div>
-            <div className="divider-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
+          {/* Divider */}
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-16 h-px bg-gray-200"></div>
+            <div className="mx-3 text-red-700">
+              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
                   d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
@@ -717,22 +177,24 @@ const Gallery = () => {
                 />
               </svg>
             </div>
-            <div className="divider-line"></div>
+            <div className="w-16 h-px bg-gray-200"></div>
           </div>
 
-          <p className="gallery-description max-w-2xl mx-auto">
+          <p className="text-gray-600 max-w-2xl mx-auto mb-10">
             A curated selection of our finest work, capturing precious moments
             and emotions across different styles and occasions.
           </p>
         </div>
 
         {/* Category filter */}
-        <div className="category-filter">
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
           {categories.map((category) => (
             <button
               key={category.id}
-              className={`category-button ${
-                filterCategory === category.id ? "active" : ""
+              className={`px-4 py-2 text-sm transition-colors ${
+                filterCategory === category.id
+                  ? "text-red-700 font-medium"
+                  : "text-gray-500 hover:text-gray-800"
               }`}
               onClick={() => setFilterCategory(category.id)}
             >
@@ -741,58 +203,83 @@ const Gallery = () => {
           ))}
         </div>
 
-        {/* Gallery grid */}
-        <div ref={galleryRef} className="gallery-grid">
-          {filteredImages.length > 0 ? (
-            filteredImages.map((item, index) => (
+        {/* Ultra simple gallery grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredImages.map((item) => (
+            <div
+              key={item.id}
+              className={`relative overflow-hidden rounded shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md ${
+                item.isHero ? "md:col-span-2" : ""
+              } ${item.isTall ? "md:row-span-2" : ""}`}
+              style={{
+                height: item.isHero
+                  ? isMobile
+                    ? "400px"
+                    : "500px"
+                  : item.isTall
+                  ? isMobile
+                    ? "400px"
+                    : "600px"
+                  : isMobile
+                  ? "350px"
+                  : "400px",
+              }}
+              onClick={() => toggleImageInfo(item.id)}
+              onMouseEnter={() => !isMobile && setActiveImageId(item.id)}
+              onMouseLeave={() => !isMobile && setActiveImageId(null)}
+            >
+              {/* Image - Always visible */}
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+              />
+
+              {/* Info overlay - Separate element */}
               <div
-                key={item.id}
-                className={`gallery-item ${item.className} ${
-                  index === 0 || index === filteredImages.length - 1
-                    ? "hero-item"
-                    : ""
-                } ${hoverIndex === index && isMobile ? "tapped" : ""}`}
-                onMouseEnter={() => setHoverIndex(index)}
-                onMouseLeave={() => setHoverIndex(null)}
-                onClick={() => handleItemClick(index)}
+                className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 flex flex-col justify-end transition-opacity duration-300 ${
+                  activeImageId === item.id ? "opacity-100" : "opacity-0"
+                }`}
               >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="gallery-image"
-                  style={{
-                    objectPosition:
-                      index === 0 ? "center 35%" : "center center",
-                  }}
-                />
+                <div
+                  className={`transform transition-transform duration-500 ${
+                    activeImageId === item.id
+                      ? "translate-y-0"
+                      : "translate-y-8"
+                  }`}
+                >
+                  <h3 className="text-white text-lg font-light mb-1">
+                    {item.title}
+                  </h3>
+                  <div
+                    className="w-0 h-0.5 bg-red-600 mb-2 transition-all duration-500"
+                    style={{ width: activeImageId === item.id ? "24px" : "0" }}
+                  ></div>
+                  <p className="text-white/90 text-sm">{item.subtitle}</p>
+                </div>
 
                 {/* Category badge */}
-                <div className="category-badge">
+                <span
+                  className={`absolute top-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded uppercase tracking-wider transition-all duration-500 ${
+                    activeImageId === item.id
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 -translate-y-4"
+                  }`}
+                >
                   {categories.find((cat) => cat.id === item.category)?.label}
-                </div>
-
-                {/* Clean overlay with subtle red accent - only visible on hover */}
-                <div className="gallery-overlay">
-                  <div className="gallery-text">
-                    <h3 className="gallery-title">{item.title}</h3>
-                    <div className="gallery-divider"></div>
-                    <p className="gallery-subtitle">{item.subtitle}</p>
-                  </div>
-                </div>
+                </span>
               </div>
-            ))
-          ) : (
-            <div className="no-results col-span-full">
-              No images found in this category.
             </div>
-          )}
+          ))}
         </div>
 
-        {/* Clean button with enhanced hover effect */}
+        {/* Button */}
         <div className="text-center mt-16">
-          <button className="portfolio-button">
+          <button className="px-8 py-3 border border-gray-800 text-gray-800 uppercase text-sm tracking-wider hover:bg-gray-800 hover:text-white transition-colors duration-300">
             View Complete Portfolio
-            <span className="arrow-icon">→</span>
+            <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1">
+              →
+            </span>
           </button>
         </div>
       </div>
