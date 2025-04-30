@@ -74,12 +74,12 @@ const About = () => {
 
         {/* Image and Content - Reordered for mobile */}
         <div className="flex flex-col lg:flex-row items-center gap-8 md:gap-16">
-          {/* Image Section - Adjusted for full visibility */}
+          {/* Image Section - Left-Aligned on Mobile */}
           <div
             ref={imageRef}
-            className="w-full lg:w-1/2 opacity-0 transform translate-x-10 transition-all duration-1000 ease-out px-6 sm:px-10 md:px-8"
+            className="w-full lg:w-1/2 opacity-0 transform translate-x-10 transition-all duration-1000 ease-out flex justify-start"
           >
-            <div className="relative p-1 border border-red-100 bg-white shadow-lg">
+            <div className="relative p-1 border border-red-100 bg-white shadow-lg w-4/5 md:w-5/6 lg:w-full">
               <img
                 src={aboutimg}
                 alt="Photography session"
@@ -138,7 +138,7 @@ const About = () => {
         </div>
       </div>
 
-      {/* Mobile-specific styles to ensure image is fully visible */}
+      {/* Mobile-specific styles */}
       <style jsx>{`
         .animate-in {
           opacity: 1 !important;
