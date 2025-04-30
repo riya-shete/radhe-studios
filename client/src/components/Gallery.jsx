@@ -29,6 +29,7 @@ const Gallery = () => {
   const [hoverIndex, setHoverIndex] = useState(null);
   const [scrollY, setScrollY] = useState(0);
   const [filterCategory, setFilterCategory] = useState("all");
+  const [isMobile, setIsMobile] = useState(false);
 
   // Image categories
   const categories = [
@@ -153,6 +154,20 @@ const Gallery = () => {
     filterCategory === "all"
       ? galleryStructure
       : galleryStructure.filter((item) => item.category === filterCategory);
+
+  // Check for mobile devices
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
 
   // Track scroll position for subtle animations
   useEffect(() => {
@@ -346,15 +361,16 @@ const Gallery = () => {
       .gallery-item {
         position: relative;
         overflow: hidden;
-        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.5s ease;
         box-shadow: 0 2px 10px rgba(0,0,0,0.04);
         border: 1px solid rgba(0,0,0,0.03);
         border-radius: 2px;
+        cursor: pointer;
       }
       
       .gallery-item:hover {
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        transform: translateY(-5px) scale(1.01);
       }
       
       /* Image styling */
@@ -362,42 +378,47 @@ const Gallery = () => {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.6s ease;
+        transition: transform 0.75s cubic-bezier(0.165, 0.84, 0.44, 1);
       }
       
       .gallery-item:hover .gallery-image {
-        transform: scale(1.05);
+        transform: scale(1.08);
       }
       
-      /* Refined overlay */
+      /* Refined overlay - HIDDEN BY DEFAULT */
       .gallery-overlay {
         position: absolute;
         inset: 0;
         background: linear-gradient(to top, 
-          rgba(0, 0, 0, 0.8) 0%, 
-          rgba(0, 0, 0, 0.4) 40%, 
-          rgba(0, 0, 0, 0.1) 80%, 
+          rgba(0, 0, 0, 0.85) 0%, 
+          rgba(0, 0, 0, 0.5) 40%, 
+          rgba(0, 0, 0, 0.2) 80%, 
           transparent 100%);
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
         padding: 28px;
         opacity: 0;
-        transition: opacity 0.4s ease;
+        transition: opacity 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), visibility 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        visibility: hidden;
       }
       
       .gallery-item:hover .gallery-overlay {
         opacity: 1;
+        visibility: visible;
       }
       
       /* Text styling */
       .gallery-text {
-        transform: translateY(15px);
-        transition: transform 0.4s ease;
+        transform: translateY(25px);
+        opacity: 0;
+        transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+        transition-delay: 0.1s;
       }
       
       .gallery-item:hover .gallery-text {
         transform: translateY(0);
+        opacity: 1;
       }
       
       .gallery-title {
@@ -416,10 +437,15 @@ const Gallery = () => {
       }
       
       .gallery-divider {
-        width: 25px;
+        width: 0;
         height: 1px;
         background: ${brandRed};
         margin: 8px 0;
+        transition: width 0.4s ease 0.3s;
+      }
+      
+      .gallery-item:hover .gallery-divider {
+        width: 25px;
       }
       
       /* Category badge */
@@ -436,8 +462,9 @@ const Gallery = () => {
         letter-spacing: 0.05em;
         font-weight: 400;
         opacity: 0;
-        transform: translateY(-5px);
-        transition: all 0.3s ease;
+        transform: translateY(-10px);
+        transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        transition-delay: 0.2s;
       }
       
       .gallery-item:hover .category-badge {
@@ -463,6 +490,10 @@ const Gallery = () => {
         }
         
         .hero-item .gallery-divider {
+          width: 0;
+        }
+        
+        .hero-item:hover .gallery-divider {
           width: 40px;
         }
       }
@@ -488,15 +519,32 @@ const Gallery = () => {
         }
         
         .gallery-overlay {
-          opacity: 1;
+          /* For touch devices, we'll use a tap-to-reveal approach */
+          transition: opacity 0.4s ease;
           background: linear-gradient(to top, 
             rgba(0, 0, 0, 0.7) 0%, 
             rgba(0, 0, 0, 0.3) 50%, 
             transparent 100%);
         }
         
-        .gallery-text {
+        /* For mobile devices only, when item is tapped, the gallery text will be visible */
+        .gallery-item.tapped .gallery-overlay {
+          opacity: 1;
+          visibility: visible;
+        }
+        
+        .gallery-item.tapped .gallery-text {
           transform: translateY(0);
+          opacity: 1;
+        }
+        
+        .gallery-item.tapped .category-badge {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        
+        .gallery-item.tapped .gallery-divider {
+          width: 25px;
         }
         
         .category-filter {
@@ -524,27 +572,46 @@ const Gallery = () => {
         font-weight: 400;
         transition: all 0.3s ease;
         cursor: pointer;
+        overflow: hidden;
+        position: relative;
+      }
+      
+      .portfolio-button:after {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        background-color: ${textDark};
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: -100%;
+        transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
       }
       
       .portfolio-button:hover {
-        background-color: ${textDark};
         color: white;
+      }
+      
+      .portfolio-button:hover:after {
+        left: 0;
       }
       
       .arrow-icon {
         margin-left: 8px;
-        transition: transform 0.3s ease;
+        position: relative;
+        transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
       }
       
       .portfolio-button:hover .arrow-icon {
-        transform: translateX(4px);
+        transform: translateX(8px);
       }
       
       /* Loading animations */
       .gallery-item {
         opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.6s ease, transform 0.6s ease;
+        transform: translateY(40px);
+        transition: opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1), 
+                    transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
       }
       
       .gallery-item.loaded {
@@ -576,6 +643,26 @@ const Gallery = () => {
       document.head.removeChild(style);
     };
   }, [scrollY, textDark, brandRed, textLight, brandRedLight]);
+
+  // Handle click for mobile devices (toggle overlay visibility)
+  const handleItemClick = (index) => {
+    if (isMobile) {
+      const items = document.querySelectorAll(".gallery-item");
+
+      // Remove tapped class from all items
+      items.forEach((item) => {
+        item.classList.remove("tapped");
+      });
+
+      // Toggle tapped class for clicked item
+      if (hoverIndex === index) {
+        setHoverIndex(null);
+      } else {
+        setHoverIndex(index);
+        items[index].classList.add("tapped");
+      }
+    }
+  };
 
   return (
     <section ref={sectionRef} className="py-24 gallery-section" id="portfolio">
@@ -664,9 +751,10 @@ const Gallery = () => {
                   index === 0 || index === filteredImages.length - 1
                     ? "hero-item"
                     : ""
-                }`}
+                } ${hoverIndex === index && isMobile ? "tapped" : ""}`}
                 onMouseEnter={() => setHoverIndex(index)}
                 onMouseLeave={() => setHoverIndex(null)}
+                onClick={() => handleItemClick(index)}
               >
                 <img
                   src={item.image}
@@ -683,7 +771,7 @@ const Gallery = () => {
                   {categories.find((cat) => cat.id === item.category)?.label}
                 </div>
 
-                {/* Clean overlay with subtle red accent */}
+                {/* Clean overlay with subtle red accent - only visible on hover */}
                 <div className="gallery-overlay">
                   <div className="gallery-text">
                     <h3 className="gallery-title">{item.title}</h3>
@@ -700,7 +788,7 @@ const Gallery = () => {
           )}
         </div>
 
-        {/* Clean button */}
+        {/* Clean button with enhanced hover effect */}
         <div className="text-center mt-16">
           <button className="portfolio-button">
             View Complete Portfolio
